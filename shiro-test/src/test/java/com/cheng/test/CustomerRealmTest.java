@@ -20,31 +20,28 @@ public class CustomerRealmTest {
 
         CustomRealm customRealm = new CustomRealm();
 
-        // 1. 构建 SecurityManager 环境
+        /* 1. 构建 SecurityManager 环境*/
         DefaultSecurityManager defaultSecurityManager = new DefaultSecurityManager();
         defaultSecurityManager.setRealm(customRealm);
 
-        // 加密
+      /*  // 加密第一步
         HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
-        // 加密算法名称
+        // 加密第二步设置算法
         matcher.setHashAlgorithmName("md5");
-        // 加密次数
+        // 加密第三步设置加密次数
         matcher.setHashIterations(1);
-
-        // 自定义 Realm 中设置加密对象
-        customRealm.setCredentialsMatcher(matcher);
-
-        // 2. 主体提交认证请求
+        // 加密第四步在自定义 Realm 中设置加密对象
+        customRealm.setCredentialsMatcher(matcher);*/
+        // 通过SecurityUtils 获取主体
         SecurityUtils.setSecurityManager(defaultSecurityManager);
         Subject subject = SecurityUtils.getSubject();
-
+        //模拟登陆输入的用户名和密码
         UsernamePasswordToken token = new UsernamePasswordToken("cheng", "123");
+        /* 2. 主体提交认证请求*/
         subject.login(token);
-
         System.out.println("isAuthenticated: " + subject.isAuthenticated());
-
+        /* 3. 主体提交授权认证*/
         subject.checkRole("admin");
-//
         subject.checkPermission("user:delete");
         subject.checkPermission("user:update");
     }

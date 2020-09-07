@@ -7,6 +7,9 @@ import org.apache.shiro.cache.CacheManager;
 import javax.annotation.Resource;
 
 /**
+ * 实现CacheManager 重写其中的getCache方法
+ * 通过自定义cache选择缓存存储方式
+ *
  * @author cheng
  *         2018/11/4 21:15
  */

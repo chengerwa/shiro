@@ -7,12 +7,14 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 /**
+ * 按授权还是认证过滤器可以继承AuthorizationFilter 也可以继承authenticationFilter
+ *
  * 自定义 filter：如果传多个 roles 满足任何一个即可
  *
  * @author cheng
  *         2018/11/4 16:29
  */
-public class RolesOrFilter extends AuthorizationFilter {
+public class RolesOrFilter extends AuthorizationFilter  {
 
     @Override
     protected boolean isAccessAllowed(ServletRequest servletRequest, ServletResponse servletResponse, Object o) {

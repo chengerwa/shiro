@@ -11,6 +11,8 @@ import java.io.Serializable;
 
 /**
  * 自定义 shiro 的 sessionManager
+ * 继承 DefaultWebSessionManager
+ * 重写了读取session时的方法retrieveSession
  *
  * @author cheng
  *         2018/11/4 17:28

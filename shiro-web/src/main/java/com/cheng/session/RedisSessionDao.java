@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * 继承 AbstractSessionDAO
+ * 重写创建、读取、修改、删除等方法，将存储方式改为redis的方式存储
  * @author cheng
  *         2018/11/4 16:45
  */
@@ -24,10 +26,10 @@ public class RedisSessionDao extends AbstractSessionDAO {
 
     private final String SHIRO_SESSION_PREFIX = "cheng-session:";
 
-
+    /*第一次会话获取会话并且存储到redis*/
     @Override
     protected Serializable doCreate(Session session) {
-
+        System.out.println("会话管理：在redisSessionDao中新增session");
         Serializable sessionId = generateSessionId(session);
         assignSessionId(session, sessionId);
         saveSession(session);
@@ -35,10 +37,12 @@ public class RedisSessionDao extends AbstractSessionDAO {
         return sessionId;
     }
 
+    /*读取redis中的sessionid对应的session会话*/
     @Override
     protected Session doReadSession(Serializable sessionId) {
 
-        System.out.println("read session");
+        System.out.println("会话管理：在redisSession方法读取session");
+        System.out.println("sessionId值： "+sessionId.toString());
         if (sessionId == null) {
             return null;
         }
@@ -48,14 +52,16 @@ public class RedisSessionDao extends AbstractSessionDAO {
         return (Session) SerializationUtils.deserialize(value);
     }
 
+    /*修改redis中的sessionid对应的session会话*/
     @Override
     public void update(Session session) throws UnknownSessionException {
-
+        System.out.println("会话管理：在redisSessionDao中修改session");
         if (session != null && session.getId() != null) {
             saveSession(session);
         }
     }
 
+    /*删除redis中的sessionid对应的session会话*/
     @Override
     public void delete(Session session) {
 
@@ -67,6 +73,7 @@ public class RedisSessionDao extends AbstractSessionDAO {
         jedisUtil.delete(key);
     }
 
+    /*获取redis中的前缀为shiro对应的session值*/
     @Override
     public Collection<Session> getActiveSessions() {
 

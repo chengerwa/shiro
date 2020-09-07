@@ -8,14 +8,17 @@ import org.apache.shiro.subject.Subject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * @author cheng
- *         2018/11/2 20:04
+ *         2019/11/2 20:04
  */
 public class AuthenticationTest {
 
+    //定义一个存储安全数据的realm 并且放入安全数据（模拟安全数据库）
     SimpleAccountRealm simpleAccountRealm = new SimpleAccountRealm();
-
     @Before
     public void addUser() {
         simpleAccountRealm.addAccount("cheng", "123", "admin", "user");
@@ -31,16 +34,20 @@ public class AuthenticationTest {
         // 2. 主体提交认证请求
         SecurityUtils.setSecurityManager(defaultSecurityManager);
         Subject subject = SecurityUtils.getSubject();
-
+        //模拟登陆的用户口令和密码
         UsernamePasswordToken token = new UsernamePasswordToken("cheng", "123");
         subject.login(token);
 
         System.out.println("isAuthenticated: " + subject.isAuthenticated());
 
-        // 检查用户是否有 admin 角色
-        subject.checkRoles("admin", "user");
+        // 3. 主体提交授权请求、检验用户是否有 admin 角色
+        subject.checkRole("admin");
+        //subject.checkRoles(Arrays.asList("admin", "user2"));
+        //subject.checkRoles("admin", "user");
 
-        // 退出认证
+        //subject.checkPermission("user:delete");
+        //subject.checkPermissions("user:delete","user:add");
+        // 4. 退出认证
         subject.logout();
 
         System.out.println("isAuthenticated: " + subject.isAuthenticated());

@@ -9,24 +9,35 @@
     <import resource="spring-redis.xml"/>
     <context:component-scan base-package="com.cheng"/>
 
+    <!--1. 配置shiroFilter 将securityMananger放入filter -->
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager"/>
+        <!--跳转到登陆页 -->
         <property name="loginUrl" value="login.html"/>
+        <!--认证失败跳转到失败页面 -->
         <property name="unauthorizedUrl" value="403.html"/>
-        <property name="filterChainDefinitions">
+        <!--配置shiro的filter -->
+       <property name="filterChainDefinitions">
+           <value>
+               /login.html = anon
+               /subLogin = anon
+               /testSession = anon
+               /* =authc
+           </value>
+        </property>
+        <!--<property name="filterChainDefinitions">
             <value>
                 /login.html = anon
                 /subLogin = anon
-                <!--  /testRole = roles["admin"]
-                  /testRole1 = roles["admin","admin1"]
-                  /testPerms = perms["user:delete"]
-                  /testPerms1 = perms["user:delete","user:add"]-->
-
-                <!--/testRole = roles["admin","admin1"]-->
+                /testRole = roles["admin"]
+                /testRole1 = roles["admin"]
+                /testPerms = perms["user:delete"]
+                /testPerms1 = perms["user:delete","user:add"]
+                /testRole = roles["admin","admin1"]
                 /testRole1 = rolesOr["admin","admin1"]
                 /* = authc
             </value>
-        </property>
+        </property>-->
         <property name="filters">
             <util:map>
                 <entry key="rolesOr" value-ref="rolesOrFilter"/>
@@ -36,14 +47,14 @@
 
     <bean id="rolesOrFilter" class="com.cheng.filter.RolesOrFilter"/>
 
+    <!--2. 构建securityManager 包含内容realm sessionManager cacheManager等 -->
     <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
-        <!-- 创建 SecurityManager 对象 -->
         <property name="realm" ref="realm"/>
         <property name="sessionManager" ref="sessionManager"/>
         <property name="cacheManager" ref="cacheManager"/>
         <property name="rememberMeManager" ref="cookieRememberMeManager"/>
     </bean>
-
+    <!--3. 创建自定义realm或者shiro自带realm  包含加密内容等 -->
     <bean id="realm" class="com.cheng.shiro.realm.CustomRealm">
         <property name="credentialsMatcher" ref="credentialsMatcher"/>
     </bean>
@@ -53,14 +64,23 @@
         <property name="hashIterations" value="1"/>
     </bean>
 
-    <!-- 使用默认的 sessionManager 会频繁的操作读 redis 使用自定义的 CustomSessionManager -->
-    <!--<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">-->
+    <!--4. 自定义会话管理器，包含sessionDao，会话监听、监测等-->
     <bean id="sessionManager" class="com.cheng.session.CustomSessionManager">
+        <!--<property name="sessionIdCookie" ref="sessionIdCookie"/>-->
+
         <property name="sessionDAO" ref="sessionDao"/>
+        <property name="sessionListeners">
+            <list>
+                <ref bean="sessionListener"/>
+            </list>
+        </property>
+        <property name="globalSessionTimeout" value="100000"/>
     </bean>
 
     <bean id="sessionDao" class="com.cheng.session.RedisSessionDao"/>
+    <bean id="sessionListener" class="com.cheng.session.MySessionListener"/>
 
+    <!--5. 自定义缓存管理器-->
     <bean id="cacheManager" class="com.cheng.cache.RedisCacheManager"/>
 
     <bean id="cookieRememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">

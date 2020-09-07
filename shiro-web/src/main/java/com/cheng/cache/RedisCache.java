@@ -11,7 +11,9 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * @author cheng
+ * 实现Cache接口
+ * 重写方法，在认证授权过程中，从指定的容器中获取数据
+ * * @author cheng
  *         2018/11/4 21:15
  */
 @Component
@@ -26,7 +28,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
     @Override
     public V get(K k) throws CacheException {
 
-        System.out.println("从 redis 获取权限数据");
+        System.out.println("缓存管理：从 redis 获取权限数据");
 
         byte[] value = jedisUtil.get(getKey(k));
         if (value != null) {
@@ -37,7 +39,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
 
     @Override
     public V put(K k, V v) throws CacheException {
-
+        System.out.println("缓存管理： redis 存储权限数据");
         byte[] key = getKey(k);
         byte[] value = SerializationUtils.serialize(v);
         jedisUtil.set(key, value);
